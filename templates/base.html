@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link type="text/css" href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet"/>
+    {% block title -%}
+        {% if title %}
+            <title>Тестовая форма регистрации - {{ title }}</title>
+        {% else %}
+            <title>Тестовая форма регистрации</title>
+        {% endif %}
+    {% endblock %}
+</head>
+<body>
+{% block content -%}
+{% block mainmenu -%}
+<ul class="mainmenu">
+</ul>
+{% endblock mainmenu -%}
+<div class="clear"></div>
+<div class="content">
+    {% if title %}
+        <h1>Тестовая форма регистрации - {{ title }}</h1>
+    {% else %}
+        <h1>Тестовая форма регистрации </h1>
+    {% endif %}
+{% endblock content -%}
+</div>
+</body>
+</html>

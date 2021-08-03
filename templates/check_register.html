@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+    {% for cat, msg in get_flashed_messages(True) %}
+        <div class="flash {{ cat }}">{{ msg }}</div>
+    {% endfor %}
+    <form action="/api" method="post" class="form-contact">
+        {% if username %}
+        <p>Курсы для пользователя {{ username }} {{ surname }}
+        {% else %}
+            <p><label>Phone: </label><input type="text" name="phone" value="" required/>
+            <p><input type="submit" value="Проверить"/>
+        {% endif %}
+
+    </form>
+{% endblock %}
