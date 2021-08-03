@@ -1,8 +1,4 @@
 from typing import List
-from exceptions import AddUserException, CheckExistUserException, CheckExistCourseException, \
-    AddUserCourseException, UserAlreadyExistsException, BadUserIdException, UnauthorizedException, \
-    PermissionDeniedException, BadRequestException, PhoneAlreadyExistsException
-from models import User
 import re, os
 import requests
 from requests.structures import CaseInsensitiveDict
@@ -57,16 +53,9 @@ class ApiRequest:
         email = self.new_user.email
         resp = requests.get(url, headers=self.headers)
         logger.debug(f"Isping Checking user exists response: status code={resp.status_code}, content={resp.content}")
-        if resp.status_code == 400:  # Bad Request
-            tree = etree.XML(resp.content)
-            message = tree.xpath('/response/message')[0].text
-            raise BadRequestException(message)
-        elif resp.status_code == 401:  # Unauthorized
-            raise UnauthorizedException(f"Unauthorized Error")
-        elif resp.status_code == 403:  # Permission denied
-            raise PermissionDeniedException(f"Permission denied")
-        elif resp.status_code != 200:  # other bad response
-            raise CheckExistUserException(f"Request check_exist_user failed {resp.status_code}")
+
+        if resp.status_code != 200:  # other bad response
+            raise Exception(f"Request check_exist_user failed {resp.status_code}")
 
 
         resp_xml_content = resp.content
@@ -113,15 +102,7 @@ class ApiRequest:
 
         logger.debug(f"Isping create user response: status code={resp.status_code}, content={resp.content}")
 
-        if resp.status_code == 400:  # Bad Request
-            tree = etree.XML(resp.content)
-            message = tree.xpath('/response/message')[0].text
-            raise Exception(message)
-        elif resp.status_code == 401:  # Unauthorized
-            raise Exception(f"Unauthorized Error")
-        elif resp.status_code == 403:  # Permission denied
-            raise Exception(f"Permission denied")
-        elif resp.status_code != 201:  # other bad response
+        if resp.status_code != 201:  # other bad response
             logger.error(f"Failed to create user")
             raise Exception(f"Request add_user failed {resp.status_code}")
 
@@ -147,17 +128,9 @@ class ApiRequest:
         resp = requests.get(url, headers=self.headers)
 
         logger.debug(f"Isping check_exist_course_user response: status code={resp.status_code}, content={resp.content}")
-        if resp.status_code == 400:  # Bad Request
-            tree = etree.XML(resp.content)
-            message = tree.xpath('/response/message')[0].text
-            raise BadRequestException(message)
-        elif resp.status_code == 401:  # Unauthorized
-            raise UnauthorizedException(f"Unauthorized Error")
-        elif resp.status_code == 403:  # Permission denied
-            raise PermissionDeniedException(f"Permission denied")
-        elif resp.status_code != 200:  # other bad response
+        if resp.status_code != 200:  # other bad response
             logger.error(f"Failed to check enrollment for user: {self.new_user.user_id} for course_id: {course_id}")
-            raise CheckExistCourseException(f"Request check_exist_enrollment_user failed {resp.status_code}")
+            raise Exception(f"Request check_exist_enrollment_user failed {resp.status_code}")
 
         resp_xml_content = resp.content
         tree = etree.XML(resp_xml_content)
@@ -194,17 +167,9 @@ class ApiRequest:
         resp = requests.post(url=url, headers=self.headers, files=files)
 
         logger.debug(f"Isping add user to courses response: status code={resp.status_code}, content={resp.content}")
-        if resp.status_code == 400:  # Bad Request
-            tree = etree.XML(resp.content)
-            message = tree.xpath('/response/message')[0].text
-            raise BadRequestException(message)
-        elif resp.status_code == 401:  # Unauthorized
-            raise UnauthorizedException(f"Unauthorized Error")
-        elif resp.status_code == 403:  # Permission denied
-            raise PermissionDeniedException(f"Permission denied")
-        elif resp.status_code != 201:
+        if resp.status_code != 201:
             logger.debug(f"Error add user {self.new_user.user_id} for courses {courses}")
-            raise AddUserCourseException(f"Request add_user_to_enrollment failed {resp.status_code}")
+            raise Exception(f"Request add_user_to_enrollment failed {resp.status_code}")
 
         logger.info(f"Add user {self.new_user.user_id} on courses {courses} successful. resp.content:{resp.content},"
                     f" resp.text={resp.text}")
